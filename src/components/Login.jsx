@@ -1,7 +1,7 @@
 import {useState} from "react"
 import axios from 'axios';
 import { useNavigate} from "react-router-dom"
-import { TextField, Button, Box } from '@mui/material';
+import { TextField, Button, Box, Typography } from '@mui/material';
 
 export default function Login(){
 
@@ -33,7 +33,7 @@ export default function Login(){
     function loginUser(event){
         event.preventDefault()
         fetchToken().then(()=>{
-            navigate("/dashboard")
+            navigate("/Dashboard")
         })
        
     }
@@ -46,38 +46,47 @@ export default function Login(){
                 display: 'flex',
                 alignItems: 'center',
                 flexDirection: 'column',
-                p: 3,
                 mx: [1, 20, "25%", "30%","35%"],
-                bgcolor: '#f0f0f1',
                 borderRadius: 1,
                 
                 }}
                 >
+            <Typography  variant="span" sx={{fontWeight:900, fontSize: 14}}>
+                Email Address or Username
+            </Typography>
             <TextField
-                label="Username/Email"
+                label="Email or Username"
                 name="username"
-                variant="standard"
+                variant="outlined"
                 required
                 value={formData.username}
                 onChange={changeFormData}
                 margin="normal"
+                sx={{mt:0,mb:2}}
             />
+            <Typography variant="span" sx={{fontWeight:900,fontSize: 14}}>
+                Password
+            </Typography>
             <TextField
                 label="Password"
                 name="password"
-                variant="standard"
+                variant="outlined"
                 type="password"
                 required
                 value={formData.password}
                 onChange={changeFormData}
                 margin="normal"
+                sx={{mt:0}}
             />
-            <Button type="submit" variant="contained" color="primary" onClick={loginUser}>
+            <Button type="submit" variant="contained"  onClick={loginUser}
+            sx={{color:"#000", backgroundColor:"#1fdf64", borderRadius:"20px" , fontWeight:900,
+            '&:hover': {color:"#000", backgroundColor:"#1bcb5a"}
+            }}>
                 Login
             </Button>
-            <Button variant="outlined" color="secondary" sx={{mt:2}}>
+            <Typography sx={{mt:3,color:"000",'&:hover': {color:"#1bcb5a"}}}>
                 Forgot Password?
-            </Button>
+            </Typography>
             <span sx={{mt:1, color:'error.main'}}>{err}</span> 
         </Box>
             

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import {Link, useNavigate } from "react-router-dom"
 import axios from 'axios';
-import { TextField, Button, Box } from '@mui/material';
+import { TextField, Button, Box, Typography } from '@mui/material';
 
 export default function SignUp(){
 
@@ -53,12 +53,13 @@ export default function SignUp(){
                 display: 'flex',
                 alignItems: 'center',
                 flexDirection: 'column',
-                p: 3,
                 mx: [1, 20, "25%", "30%","35%"],
-                bgcolor: '#f0f0f1',
                 borderRadius: 1,
                 }}
             >
+                <Typography  variant="span" sx={{fontWeight:900, fontSize: 14}}>
+                    First Name
+                </Typography>
                 <TextField
                     label="First Name"
                     name="firstname"
@@ -108,14 +109,16 @@ export default function SignUp(){
                     margin="normal"
                 />
 
-                <Button type="submit" variant="contained" color="success" onClick={submitForm} sx={{mt:1}}>
-                    Create New Account
+                <Button type="submit" variant="contained" onClick={submitForm} 
+                sx={{mt:1, color:"#000", backgroundColor:"#1fdf64", borderRadius:"20px" , fontWeight:900,
+                '&:hover': {color:"#000", backgroundColor:"#1bcb5a"}}}>
+                    Sign up
                 </Button>
                 <div style={{color:"red"}}>{regStatus}</div>
                 
                 <Box sx={{mt:2, color:"#503e23"}}>
                     Already have account? 
-                    <Link to="/login" style={{color:"blue", textDecoration:"none"}}> Click Here</Link>
+                    <Link to="/login" style={{color:"#1db954"}}> Log in</Link>
                 </Box>
             </Box>
         </form>

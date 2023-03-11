@@ -3,6 +3,7 @@ import Login from "./components/Login"
 import SignUp from "./components/Signup"
 import Navbar from "./components/Navbar"
 import Dashboard from "./components/Dashboard"
+import Playlist from "./components/Playlist"
 import Profile from "./components/Profile"
 import PrivateRoutes from './PrivateRoutes'
 import {Routes, Route} from 'react-router-dom'
@@ -13,15 +14,16 @@ function App() {
   return (
     <div className="App">
       <UserContextProvider>
-      <Navbar />
+      <Home />
       <Routes>
-        <Route path='/' element={<Home/>}>
+        <Route path='/'>
           <Route path='signup' element={<SignUp/>}/>
           <Route path='login' element={<Login />}/>
         </Route>
         
         <Route element={<PrivateRoutes/>}>
           <Route path='Dashboard' element={<Dashboard />}/>
+          <Route path='Library' element={<Playlist/>}/>
           <Route path='Profile' element={<Profile />}/>
         </Route>
       </Routes>
