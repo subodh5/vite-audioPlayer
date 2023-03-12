@@ -55,7 +55,6 @@ export default function Login(){
                 Email Address or Username
             </Typography>
             <TextField
-                label="Email or Username"
                 name="username"
                 variant="outlined"
                 required
@@ -63,12 +62,12 @@ export default function Login(){
                 onChange={changeFormData}
                 margin="normal"
                 sx={{mt:0,mb:2}}
+
             />
             <Typography variant="span" sx={{fontWeight:900,fontSize: 14}}>
                 Password
             </Typography>
             <TextField
-                label="Password"
                 name="password"
                 variant="outlined"
                 type="password"

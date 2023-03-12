@@ -5,3 +5,7 @@
 body{
     font-family: 'Courier New', Courier, monospace;
 }
+.App{
+    height: 100vh;
+    position: relative;
+}

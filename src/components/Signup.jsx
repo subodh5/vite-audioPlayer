@@ -88,6 +88,21 @@ export default function SignUp(){
                     margin="normal"
                 />
 
+
+                <TextField
+                    label="Date of Birth"
+                    name="dob"
+                    variant="standard"
+                    type="date"
+                    required
+                    value={formData.dob}
+                    onChange={changeFormData}
+                    margin="normal"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+
                 <TextField
                     label="Password"
                     name="password"

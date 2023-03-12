@@ -1,7 +1,6 @@
 import Home from "./components/Home"
 import Login from "./components/Login"
 import SignUp from "./components/Signup"
-import Navbar from "./components/Navbar"
 import Dashboard from "./components/Dashboard"
 import Playlist from "./components/Playlist"
 import Profile from "./components/Profile"

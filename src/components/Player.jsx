@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import { Button} from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Slider from '@mui/material/Slider';
@@ -12,8 +11,6 @@ import FastForwardRounded from '@mui/icons-material/FastForwardRounded';
 import FastRewindRounded from '@mui/icons-material/FastRewindRounded';
 import VolumeUpRounded from '@mui/icons-material/VolumeUpRounded';
 import VolumeDownRounded from '@mui/icons-material/VolumeDownRounded';
-import MusicNoteIcon from '@mui/icons-material/MusicNote';
-import axios from 'axios';
 
 
 const Widget = styled('div')(({ theme }) => ({
@@ -39,38 +36,49 @@ const TinyText = styled(Typography)({
 
 
 const context = new AudioContext()
-let audioBuffer;
 
-export default function MusicPlayerSlider() {
+export default function Player({audioBuffer, audioName}) {
   const theme = useTheme();
-  const duration=2; // seconds
-  const [position, setPosition] = React.useState(32);
+  const [position, setPosition] = React.useState(0);
+  const [flag, setFlag]=React.useState(false)
   const [paused, setPaused] = React.useState(true);
+  const [volume, setVolume] = React.useState(30);
   let started= React.useRef(false)
-  const [audioFile, setAudioFile]=React.useState(null)
-  const [uploadErr, setuploadErr]=React.useState("")
 
-  function uploadAudio(event){
-    const formData = new FormData();
-    formData.append('input', event.target.files[0]);
+  const intervalId = React.useRef(null);
 
-    axios.post("http://127.0.0.1:8001", formData, { 'Content-Type': 'multipart/form-data'})
-    .then((response) => {
-      const waveform= response.data.waveform
-      audioBuffer = context.createBuffer(1, waveform[0].length, 16000);
-      const nowBuffering = audioBuffer.getChannelData(0);
-      nowBuffering.set(waveform[0]);
+  function startUpdatingPosition() {
 
-    })
-    .catch((error) => {
-      setuploadErr(error)
-  });
+    if(flag && audioBuffer){
+      intervalId.current = setInterval(() => {
+        setPosition(currentPosition => currentPosition + 1);
+      }, 1000);
+    }
+    else{
+      clearInterval(intervalId.current)
+    }
+    
   }
- 
+
+  function stopUpdatingPosition() {
+    clearInterval(intervalId.current);
+    setPosition(0)
+  }
+
+
+  React.useEffect(() => {
+    setFlag(true);
+    return () => clearInterval(intervalId.current);
+  }, []);
 
   React.useEffect(()=>{
     
     let source = context.createBufferSource()
+    const gainNode = context.createGain();
+    gainNode.gain.value = Math.floor(volume/10);
+    source.connect(gainNode);
+    gainNode.connect(context.destination);
+
     if(!paused){
       if(!started.current){
       started.current=true
@@ -78,6 +86,8 @@ export default function MusicPlayerSlider() {
       source.connect(context.destination);
       source.start();
       context.resume()
+      startUpdatingPosition()
+      
       }
       
     }
@@ -86,12 +96,18 @@ export default function MusicPlayerSlider() {
         started.current=false
         source.start();
         source.stop()
+        stopUpdatingPosition()
       }
     }
-    console.log(started);
-  },[paused])
+    
+  },[paused,audioBuffer,volume])
 
+  function handleVolumeChange(_, newValue) {
+    setVolume(newValue);
 
+    // Set the volume of the destination node
+    // context.destination.volume = newValue;
+  }
 
 
   const mainIconColor = theme.palette.mode === 'dark' ? '#fff' : '#000';
@@ -100,53 +116,15 @@ export default function MusicPlayerSlider() {
   
 
   return (
-    <Box sx={{mx:"auto"}}>
-
-    <form onSubmit={uploadAudio}>
-      <label htmlFor="audio-upload">
-        <Button
-          variant="contained"
-          component="span"
-          endIcon={<MusicNoteIcon />}
-          sx={{
-            color: "#000",
-            backgroundColor: "#1fdf64",
-            borderRadius: "20px",
-            fontWeight: 900,
-            "&:hover": {
-              color: "#000",
-              backgroundColor: "#1bcb5a",
-            },
-          }}
-        >
-          Upload
-        </Button>
-      </label>
-      <input
-        id="audio-upload"
-        hidden
-        type="file"
-        onChange={(event) => {
-          event.preventDefault();
-          setAudioFile(event.target.files[0]);
-          uploadAudio(event);
-        }}
-      />
-      <Typography variant="body1" color="textSecondary" display="inline">
-      {uploadErr}
-      </Typography>
-      <Typography>{audioFile ? audioFile.name : ""}</Typography>
-    </form>
-
-
+    <Box >
     <Box sx={{ width: '80%', overflow: 'hidden', m:2}}>
       <Widget>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ ml: 1.5, minWidth: 0 }}>
             <Typography noWrap>
-              <b>Playing</b> 
-              <Typography color="textSecondary" display="inline">
-                {audioFile ? audioFile.name : " select audio"}
+              <b>Playing </b> 
+              <Typography color="textSecondary" display="inline" component={'span'}>
+                {audioName}
               </Typography>
             </Typography>
           </Box>
@@ -157,7 +135,7 @@ export default function MusicPlayerSlider() {
           value={position}
           min={0}
           step={1}
-          max={duration}
+          max={audioBuffer?audioBuffer.duration:2}
           onChange={(_, value) => setPosition(value)}
           sx={{
             color: theme.palette.mode === 'dark' ? '#fff' : 'rgba(0,0,0,0.87)',
@@ -195,7 +173,7 @@ export default function MusicPlayerSlider() {
           }}
         >
           <TinyText>0</TinyText>
-          <TinyText>2</TinyText>
+          <TinyText>{audioBuffer?audioBuffer.duration:2}</TinyText>
         </Box>
         <Box
           sx={{
@@ -228,6 +206,8 @@ export default function MusicPlayerSlider() {
         <Stack spacing={2} direction="row" sx={{ mb: 1, px: 1 }} alignItems="center">
           <VolumeDownRounded htmlColor={lightIconColor} />
           <Slider
+            value={volume}
+            onChange={handleVolumeChange}
             aria-label="Volume"
             defaultValue={30}
             sx={{

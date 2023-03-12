@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useUser} from '../UserContextProvider'
+import axios from 'axios';
 import {
   Card,
   CardContent,
@@ -26,17 +27,35 @@ const Profile = () => {
 
   const [editing, setEditing] = useState(false);
 
+
   const handleEditClick = () => {
     setEditing(true);
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = (event) => {
+    event.preventDefault();
     setEditing(false);
+    let data = JSON.stringify(currentUser);
+    console.log(data);
+    axios.patch('http://127.0.0.1:8000/api/user/profile/', {
+        data:data
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+    .then((response)=>{
+        
+    })
+    .catch((err)=>console.log(err))
+    
     // TODO: Save changes to server
   };
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ maxWidth: 345, mx:[1, 20, "25%", "30%","35%"] }}>
       <CardContent>
         <Avatar sx={{ width: 128, height: 128 }} />
         {editing ? (
