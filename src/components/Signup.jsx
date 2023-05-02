@@ -1,5 +1,5 @@
 import { useState } from "react"
-import {Link, useNavigate } from "react-router-dom"
+import {Link } from "react-router-dom"
 import axios from 'axios';
 import { TextField, Button, Box, Typography } from '@mui/material';
 
@@ -9,13 +9,12 @@ export default function SignUp(){
         firstname:"",
         lastname:"",
         email:"",
-        dob:null,
+        dob:"",
         password:"",
         password2:""
     })
    
     const [regStatus, setRegStatus]=useState(null)
-    const navigate=useNavigate()
 
     function changeFormData(event){
         setFormData((prevState)=>{
@@ -40,7 +39,17 @@ export default function SignUp(){
             }
           })
         .then((response)=>{
-            console.log(response.data);
+            setFormData({
+                firstname:"",
+                lastname:"",
+                email:"",
+                dob:"",
+                password:"",
+                password2:""
+            })
+            if (response.status===201){
+                setRegStatus("Registration successful")
+            }
         })
         .catch(()=>{setRegStatus("Registration Failed")})
     }
@@ -135,6 +144,7 @@ export default function SignUp(){
                     Already have account? 
                     <Link to="/login" style={{color:"#1db954"}}> Log in</Link>
                 </Box>
+
             </Box>
         </form>
     )

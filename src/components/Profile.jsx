@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUser} from '../UserContextProvider'
 import axios from 'axios';
 import {
@@ -15,8 +15,19 @@ const Profile = () => {
     const [currentUser, setCurrentUser]=useState({
         first_name:useUser().first_name,
         last_name:useUser().last_name,
-        email:useUser().email
+        email:useUser().email,
+        profile_img:null
     })
+    
+    const [profilePicture, setProfilePicture] = useState(null);
+
+    const imgsrc = useUser().profile_img
+
+    const handleProfilePictureChange = (event) => {
+      setCurrentUser((prevUser)=>{
+        return {...prevUser, profile_img:event.target.files[0]}
+    })
+    };
 
     function changeDetail(event){
         setCurrentUser((prevUser)=>{
@@ -32,34 +43,38 @@ const Profile = () => {
     setEditing(true);
   };
 
+
   const handleSaveClick = (event) => {
     event.preventDefault();
     setEditing(false);
-    let data = JSON.stringify(currentUser);
-    console.log(data);
-    axios.patch('http://127.0.0.1:8000/api/user/profile/', {
-        data:data
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
+    let formData = new FormData();
+    if (currentUser.profile_img) {
+      formData.append('profile_picture', currentUser.profile_img);
+    }
+    formData.append('first_name', currentUser.first_name);
+    formData.append('last_name', currentUser.last_name);
+    formData.append('email', currentUser.email);
+    axios.patch('http://127.0.0.1:8000/api/user/profile/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
     .then((response)=>{
-        
+      console.log(response)
     })
     .catch((err)=>console.log(err))
     
     // TODO: Save changes to server
   };
+    
 
   return (
     <Card sx={{ maxWidth: 345, mx:[1, 20, "25%", "30%","35%"] }}>
       <CardContent>
-        <Avatar sx={{ width: 128, height: 128 }} />
         {editing ? (
           <div>
+            <input type="file" onChange={handleProfilePictureChange} />
             <TextField
               label="First Name"
               name='first_name'
@@ -87,6 +102,7 @@ const Profile = () => {
           </div>
         ) : (
           <div>
+            <Avatar src={useUser().profile_img} sx={{ width: 128, height: 128 }} />
             <Typography variant="h5" component="h2">
               {useUser().first_name} {useUser().last_name}
             </Typography>
@@ -95,6 +111,7 @@ const Profile = () => {
             </Typography>
           </div>
         )}
+
       </CardContent>
       {editing && (
         <CardActions>

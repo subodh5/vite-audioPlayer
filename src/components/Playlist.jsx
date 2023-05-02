@@ -152,7 +152,7 @@ const Playlist = ({ tracks }) => {
     </PlaylistWrapper>
 
     <div style={{ position: "fixed", bottom: 0,left:'50%', transform: 'translate(-50%)'}}>
-      {currentAudio && <Player audioBuffer={audioBuffer} audioName={currentAudio.name} />}
+      {currentAudio && <Player audioBuffer={audioBuffer} audioName={currentAudio.name}/>}
     </div>
     </Box>
   );

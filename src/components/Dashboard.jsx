@@ -84,7 +84,7 @@ const Dashboard = () => {
         <Typography>{audioFile ? audioFile.name : ""}</Typography>
       </form>
       
-      <Player audioBuffer={audioBuffer} audioName={audioFile ? audioFile.name : " <select audio>"} />
+      <Player audioBuffer={audioBuffer} audioName={audioFile ? audioFile.name : " <select audio>"}/>
      
 
     </Box>

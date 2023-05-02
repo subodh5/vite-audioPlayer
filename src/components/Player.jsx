@@ -35,15 +35,18 @@ const TinyText = styled(Typography)({
 });
 
 
-const context = new AudioContext()
 
 export default function Player({audioBuffer, audioName}) {
   const theme = useTheme();
   const [position, setPosition] = React.useState(0);
   const [flag, setFlag]=React.useState(false)
-  const [paused, setPaused] = React.useState(true);
+  const [audioStatus, setAudioStatus] = React.useState("idle");
   const [volume, setVolume] = React.useState(30);
-  let started= React.useRef(false)
+  const [disabled, setDisabled]= React.useState(true)
+
+  const contextRef = React.useRef(new AudioContext());
+  const sourceRef = React.useRef(null);
+  
 
   const intervalId = React.useRef(null);
 
@@ -65,48 +68,55 @@ export default function Player({audioBuffer, audioName}) {
     setPosition(0)
   }
 
-
   React.useEffect(() => {
+
     setFlag(true);
     return () => clearInterval(intervalId.current);
   }, []);
 
   React.useEffect(()=>{
-    
-    let source = context.createBufferSource()
-    const gainNode = context.createGain();
-    gainNode.gain.value = Math.floor(volume/10);
-    source.connect(gainNode);
-    gainNode.connect(context.destination);
+    setDisabled(true)
+  },[audioName])
 
-    if(!paused){
-      if(!started.current){
-      started.current=true
-      source.buffer = audioBuffer;
-      source.connect(context.destination);
-      source.start();
-      context.resume()
-      startUpdatingPosition()
-      
-      }
-      
-    }
-    else{
-      if(started.current && source){
-        started.current=false
-        source.start();
-        source.stop()
-        stopUpdatingPosition()
-      }
-    }
+  React.useEffect(()=>{
+    setDisabled(false)
+  },[audioBuffer])
+
+
+  React.useEffect(()=>{
+
+    let source = sourceRef.current || contextRef.current.createBufferSource();
+    sourceRef.current = source;
+
+    const gainNode = contextRef.current.createGain();
+    gainNode.gain.value = Math.floor(volume / 10);
+    source.connect(gainNode);
+    gainNode.connect(contextRef.current.destination);
+  
     
-  },[paused,audioBuffer,volume])
+    if(audioStatus=== "play"){
+      if(!source.buffer){
+        source.buffer = audioBuffer;
+      }
+      source.connect(contextRef.current.destination);
+      source.start();
+      contextRef.current.resume();
+      startUpdatingPosition()
+
+    }
+    else if(audioStatus==="stop"){
+
+        source.stop();
+        contextRef.current = new AudioContext()
+        sourceRef.current=null
+        stopUpdatingPosition()
+    }
+ 
+    
+  },[audioStatus,volume])
 
   function handleVolumeChange(_, newValue) {
     setVolume(newValue);
-
-    // Set the volume of the destination node
-    // context.destination.volume = newValue;
   }
 
 
@@ -187,10 +197,19 @@ export default function Player({audioBuffer, audioName}) {
             <FastRewindRounded fontSize="large" htmlColor={mainIconColor} />
           </IconButton>
           <IconButton
-            aria-label={paused ? 'play' : 'pause'}
-            onClick={() => setPaused(!paused)}
+            aria-label={audioStatus==="stop" || audioStatus==="idle" ? 'pause' : 'play'}
+            onClick={() => {
+              if(!disabled){
+              if(audioStatus==="play"){
+                setAudioStatus("stop")
+              }
+              else if(audioStatus==="stop" || audioStatus==="idle"){
+                setAudioStatus("play")
+              }
+            }
+            }}
           >
-            {paused ? (
+            {audioStatus==="stop" || audioStatus==="idle" ? (
               <PlayArrowRounded
                 sx={{ fontSize: '3rem' }}
                 htmlColor={mainIconColor}

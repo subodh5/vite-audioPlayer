@@ -1,6 +1,6 @@
 import {useState} from "react"
 import axios from 'axios';
-import { useNavigate} from "react-router-dom"
+import { useNavigate, Link as RouterLink} from "react-router-dom"
 import { TextField, Button, Box, Typography } from '@mui/material';
 
 export default function Login(){
@@ -83,7 +83,7 @@ export default function Login(){
             }}>
                 Login
             </Button>
-            <Typography sx={{mt:3,color:"000",'&:hover': {color:"#1bcb5a"}}}>
+            <Typography component={RouterLink} to="/reset" sx={{mt:3, color:"#000",textDecoration:'none','&:hover': {color:"#1bcb5a"}}}>
                 Forgot Password?
             </Typography>
             <span sx={{mt:1, color:'error.main'}}>{err}</span> 
