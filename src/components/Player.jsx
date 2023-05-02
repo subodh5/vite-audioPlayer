@@ -199,7 +199,7 @@ export default function Player({audioBuffer, audioName}) {
           <IconButton
             aria-label={audioStatus==="stop" || audioStatus==="idle" ? 'pause' : 'play'}
             onClick={() => {
-              if(!disabled){
+              if(!disabled &&audioBuffer){
               if(audioStatus==="play"){
                 setAudioStatus("stop")
               }
