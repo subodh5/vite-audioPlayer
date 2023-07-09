@@ -3,4 +3,5 @@ WORKDIR /app
 COPY package*.json ./
 COPY . .
 EXPOSE 5173
-CMD [ "npm", "run","dev"]
+RUN npm ci --only=production
+CMD [ "npm", "run", "dev" ]
